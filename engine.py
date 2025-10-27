@@ -3,8 +3,11 @@
     La clase Value que se encarga de rastrear sus instancias e ir construyendo 
     un arbol computacional para después poder calcular las derivadas respecto de cada valor.
 """
-import graphviz
+import math
 from collections import deque
+
+import graphviz
+
 
 class Value():
 
@@ -56,7 +59,7 @@ class Value():
 
         def backward():
             self.grad += res.grad
-            other.grad += res.grad
+            other.grad += -res.grad
         res._backward = backward
 
         return res
@@ -65,12 +68,12 @@ class Value():
         if not isinstance(other, Value):
             other = Value(other)
         res = Value()
-        res.data = other.data - res.data
+        res.data = other.data - self.data
         res._op = "-"
         res._prev = (other, self)
 
         def backward():
-            self.grad += res.grad
+            self.grad += -res.grad
             other.grad += res.grad
         res._backward = backward
 
@@ -112,10 +115,10 @@ class Value():
         res = Value()
         res.data = self.data ** other
         res._op = "**"
-        res._prev = (self.data, other)
+        res._prev = (self,)
 
         def backward():
-            self.grad += res.grad * other.data * ((self.data) ** (other.data - 1))
+            self.grad += res.grad * other * ((self.data) ** (other - 1))
         res._backward = backward
 
         return res
@@ -123,7 +126,7 @@ class Value():
     def __truediv__(self, other):
         if not isinstance(other, Value):
             other = Value(other)
-        elif other == 0.:
+        elif other.data == 0.:
             raise ZeroDivisionError("The division by zero is not allowed.")
         res = Value()
         res.data = self.data / other.data
@@ -140,7 +143,7 @@ class Value():
     def __rtruediv__(self, other):
         if not isinstance(other, Value):
             other = Value(other)
-        elif other == 0.:
+        elif self.data == 0.:
             raise ZeroDivisionError("The division by zero is not allowed.")
         res = Value()
         res.data = other.data / self.data
@@ -152,13 +155,12 @@ class Value():
             other.grad += res.grad / self.data
         res._backward = backward
 
-        return res
+        return res    
 
     def __repr__(self):
-        return f"Value(data={self.data})"
+        return f"Value(data={self.data}, grad={self.grad})"
     
     def backward(self):
-        
         topo = []
         visited = set()
         def build_topo(v):
