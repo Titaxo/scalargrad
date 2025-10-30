@@ -2,14 +2,15 @@ import random
 
 from engine import Value
 from activations import *
+from initializers import *
 
 # TODO: Comprobaciones de dimensiones de input
 class Perceptron():
     
-    def __init__(self, nin, act_func=None, bias=True):
+    def __init__(self, nin, nout=1, act_func=None, bias=True):
         self.nin = nin
-        self.w = [Value(random.normalvariate()) for _ in range(self.nin)]
-        self.b = Value(random.normalvariate()) if bias else None
+        self.w =  he_init(self.nin) if act_func == "relu" else xavier_init(self.nin, nout)
+        self.b = Value(0.) if bias else None
         self.act_func=ACTIVATION_FUNCTIONS.get(act_func, None)
         
     def __call__(self, x):
