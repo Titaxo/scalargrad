@@ -22,16 +22,16 @@ def grad_check(func, *inputs, eps=1e-6, tol=1e-4):
         print(f"Variable {i+1}: grad_num={grad_num}, grad_auto={vals_autograd[i].grad}, error={error}")
         
         
-a, b = Value(2), Value(8)
-func = lambda a, b: (a * b) / (a + b)
+# a, b = Value(2), Value(8)
+# func = lambda a, b: a + b
 # grad_check(func, a, b)
 
-X, y = [(0, 0), (0, 1), (1, 0), (1, 1)], [0, 0, 0, 1]
-nn = MLP([2, 8, 4, 1], act_funcs=["relu", "sigmoid"], biases=[True, True])
+X, y = [(0, 0), (0, 1), (1, 0), (1, 1)], [(0, 0), (1, 0), (0, 1), (1, 1)]
+nn = MLP([2, 8, 4, 2], act_funcs=["relu", "relu", "sigmoid"], biases=[True, True, True])
 optimizer = AdamW(nn.parameters(), learning_rate=1e-3, betas=(0.9, 0.999), weight_decay=0.)
 # optimizer = SGD(nn.parameters(), learning_rate=1e-3)
 
-max_epochs = 10_000
+max_epochs = 5_000
 history = []
 grads = {id(p):[] for p in nn.parameters()}
 grad_norm_list = []
@@ -39,7 +39,7 @@ grad_norm_list = []
 for epoch in range(max_epochs):
     loss = Value(0.)
     for x, y_true in zip(X, y):
-        y_pred = nn(x)[0]
+        y_pred = nn(x)
         loss += mse(y_pred, y_true)
     mean_loss = loss / len(y)
     mean_loss.backward()

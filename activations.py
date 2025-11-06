@@ -40,4 +40,24 @@ def tanh(x):
     
     return res
 
-ACTIVATION_FUNCTIONS = {"sigmoid": sigmoid, "relu": relu, "tanh": tanh}
+def softmax(inputs):
+    max_x = max(x.data for x in inputs)
+    exps = [math.exp(x.data - max_x) for x in inputs]
+    total = sum(exps)
+    results = []
+    
+    for i, x in enumerate(inputs):
+        y = Value(exps[i] / total)
+        y._op = "softmax"
+        y._prev = tuple(inputs)
+        results.append(y)
+    
+    for i, y_i in enumerate(results):
+        def _backward(i=i):
+            for j, x_j in enumerate(inputs):
+                grad_contrib = y_i.data * ((1 if i == j else 0) - results[j].data)
+                x_j.grad += y_i.grad * grad_contrib
+        y_i._backward = _backward
+    return results
+        
+ACTIVATION_FUNCTIONS = {"sigmoid": sigmoid, "relu": relu, "tanh": tanh, "softmax": softmax}

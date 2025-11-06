@@ -156,6 +156,19 @@ class Value():
         res._backward = backward
 
         return res    
+    
+    def log(self):
+        # log(x)
+        res = Value(math.log(self.data))
+        res._op = "log"
+        res._prev = (self,)
+        
+        def _backward():
+            # d(log(x)) / dx = 1/x
+            self.grad += res.grad / self.data
+        res._backward = _backward
+
+        return res
 
     def __repr__(self):
         return f"Value(data={self.data}, grad={self.grad})"

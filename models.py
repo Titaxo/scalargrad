@@ -32,13 +32,16 @@ class LinearLayer():
     def __init__(self, nin, nout, act_func=None, bias=True):
         self.nin = nin
         self.nout = nout
-        self.neurons = [Perceptron(self.nin, act_func=act_func, bias=bias) for _ in range(self.nout)]
+        self.neurons = [Perceptron(self.nin, bias=bias) for _ in range(self.nout)]
+        self.act_func=ACTIVATION_FUNCTIONS.get(act_func, None)
         
     def __call__(self, x):
-        res = []
-        for neuron in self.neurons:
-            res.append(neuron(x))
-        return res
+        outputs = [neuron(x) for neuron in self.neurons]
+        if self.act_func == softmax:
+            outputs = self.act_func(outputs)
+        elif self.act_func is not None:
+            outputs = [self.act_func(o) for o in outputs]
+        return outputs
     
     def parameters(self):
         params = []
