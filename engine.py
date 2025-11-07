@@ -169,9 +169,34 @@ class Value():
         res._backward = _backward
 
         return res
-
+    
+    def __eq__(self, other):
+        if not isinstance(other, (Value, int, float)):
+            raise Exception("Las instancias de Value solo se pueden comparar con tipos int, float y Value.")
+        elif isinstance(other, Value):
+            return self.data == other.data
+        return self.data == other
+    
+    def __lt__(self, other):
+        if not isinstance(other, (Value, int, float)):
+            raise Exception("Las instancias de Value solo se pueden comparar con tipos int, float y Value.")
+        elif isinstance(other, Value):
+            return self.data < other.data
+        return self.data < other
+    
+    def __gt__(self, other):
+        if not isinstance(other, (Value, int, float)):
+            raise Exception("Las instancias de Value solo se pueden comparar con tipos int, float y Value.")
+        elif isinstance(other, Value):
+            return self.data > other.data
+        return self.data > other
+    
     def __repr__(self):
         return f"Value(data={self.data}, grad={self.grad})"
+    
+    def __hash__(self):
+        return id(self)
+
     
     def backward(self):
         topo = []

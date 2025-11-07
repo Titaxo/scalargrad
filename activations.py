@@ -53,7 +53,7 @@ def softmax(inputs):
         results.append(y)
     
     for i, y_i in enumerate(results):
-        def _backward(i=i):
+        def _backward(i=i, y_i=y_i):
             for j, x_j in enumerate(inputs):
                 grad_contrib = y_i.data * ((1 if i == j else 0) - results[j].data)
                 x_j.grad += y_i.grad * grad_contrib

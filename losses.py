@@ -11,10 +11,9 @@ def mse(y_pred, y_true):
         return (y_pred - y_true)**2
     
 def cross_entropy(y_pred, y_true):
-    eps = 1e-9
     loss = Value(0.)
     for yp, yt in zip(y_pred, y_true):
         if yt == 1:
             # asumimos que yp.data está en (0,1)
-            loss += -1*((yp + eps).log())
+            loss += -1*(yp.log())
     return loss
