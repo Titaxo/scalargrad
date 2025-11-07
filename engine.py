@@ -155,7 +155,7 @@ class Value():
             other.grad += res.grad / self.data
         res._backward = backward
 
-        return res    
+        return res
     
     def log(self):
         # log(x)

@@ -34,6 +34,7 @@ class LinearLayer():
         self.nout = nout
         self.neurons = [Perceptron(self.nin, bias=bias) for _ in range(self.nout)]
         self.act_func=ACTIVATION_FUNCTIONS.get(act_func, None)
+        self.last_output = None
         
     def __call__(self, x):
         outputs = [neuron(x) for neuron in self.neurons]
@@ -41,6 +42,7 @@ class LinearLayer():
             outputs = self.act_func(outputs)
         elif self.act_func is not None:
             outputs = [self.act_func(o) for o in outputs]
+        self.last_output = [o.data for o in outputs]
         return outputs
     
     def parameters(self):
